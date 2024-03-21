@@ -1,0 +1,243 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<title>Google Maps JavaScript API v3 Example: Control Positioning</title>
+<link href="default.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
+<script type="text/javascript">
+  var map;
+  var lat0 = -19.942129;
+  var lon0 = -44.035904;
+  
+  function initialize() {
+    var myOptions = {
+      zoom: 12,
+      center: new google.maps.LatLng(lat0, lon0),
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+          style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+          position: google.maps.ControlPosition.BOTTOM_CENTER
+      },
+      panControl: true,
+      panControlOptions: {
+          position: google.maps.ControlPosition.TOP_RIGHT
+      },
+      zoomControl: true,
+      zoomControlOptions: {
+          style: google.maps.ZoomControlStyle.LARGE,
+          position: google.maps.ControlPosition.LEFT_CENTER
+      },
+      scaleControl: true,
+      scaleControlOptions: {
+          position: google.maps.ControlPosition.TOP_LEFT
+      },
+      streetViewControl: true,
+      streetViewControlOptions: {
+          position: google.maps.ControlPosition.LEFT_TOP
+      }
+    }
+    map = new google.maps.Map(document.getElementById("map_canvas"),
+                                  myOptions);                          
+        
+     
+  }
+
+function deg(radi){ return radi*(180/Math.PI); }
+
+rad = function(x) { return x*Math.PI/180;}
+
+
+
+function desenhar(){
+
+  
+    var d= 50;
+    var R = 6371;
+    d = d/R;
+
+    var lat1 = parseFloat(document.pontos.lat1.value);
+    var lon1 = parseFloat(document.pontos.lon1.value);
+    var az1  = parseFloat(document.pontos.az1.value);
+   
+    var lat2 = parseFloat(document.pontos.lat2.value);
+    var lon2 = parseFloat(document.pontos.lon2.value);
+    var az2  = parseFloat(document.pontos.az2.value);
+
+
+    var lat3 = parseFloat(document.pontos.lat3.value);
+    var lon3 = parseFloat(document.pontos.lon3.value);
+    var az3  = parseFloat(document.pontos.az3.value);
+
+    var p1 = new google.maps.LatLng(lat1, lon1);
+    var p2 = new google.maps.LatLng(lat2, lon2);
+    var p3 = new google.maps.LatLng(lat3, lon3);
+
+    lat1 = rad(lat1);
+    lon1 = rad(lon1);
+    az1 = rad(az1);
+
+    lat2 = rad(lat2);
+    lon2 = rad(lon2);
+    az2 = rad(az2);
+
+    lat3 = rad(lat3);
+    lon3 = rad(lon3);
+    az3 = rad(az3);
+
+
+
+    var latA = Math.asin( Math.sin(lat1)*Math.cos(d) + 
+		    Math.cos(lat1)*Math.sin(d)*Math.cos(az1) );
+
+    var lonA = lon1 + Math.atan2(Math.sin(az1)*Math.sin(d)*Math.cos(latA), 
+                     Math.cos(d)-Math.sin(lat1)*Math.sin(latA));
+
+
+
+    var latB = Math.asin( Math.sin(lat2)*Math.cos(d) + 
+		    Math.cos(lat2)*Math.sin(d)*Math.cos(az2) );
+
+    var lonB = lon1 + Math.atan2(Math.sin(az2)*Math.sin(d)*Math.cos(latB), 
+                     Math.cos(d)-Math.sin(lat2)*Math.sin(latB));
+
+
+
+    var latC = Math.asin( Math.sin(lat3)*Math.cos(d) + 
+		    Math.cos(lat3)*Math.sin(d)*Math.cos(az3) );
+
+    var lonC = lon1 + Math.atan2(Math.sin(az3)*Math.sin(d)*Math.cos(latC), 
+                     Math.cos(d)-Math.sin(lat3)*Math.sin(latC));
+
+
+
+
+
+   var pA = new google.maps.LatLng( parseFloat(deg(latA)), parseFloat(deg(lonA)));
+   var pB = new google.maps.LatLng( parseFloat(deg(latB)), parseFloat(deg(lonB)));
+   var pC = new google.maps.LatLng( parseFloat(deg(latC)), parseFloat(deg(lonC)));
+
+    
+
+    var flightPlanCoordinates1 = [p1,pA];
+    var flightPlanCoordinates2 = [p2,pB];
+    var flightPlanCoordinates3 = [p3,pC];
+
+    var flightPath1 = new google.maps.Polyline({
+      path: flightPlanCoordinates1,
+      strokeColor: "#FF0000",
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+
+
+    var flightPath2 = new google.maps.Polyline({
+      path: flightPlanCoordinates2,
+      strokeColor: "#FF0000",
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+
+
+    var flightPath3 = new google.maps.Polyline({
+      path: flightPlanCoordinates3,
+      strokeColor: "#FF0000",
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+
+    flightPath1.setMap(map);
+    flightPath2.setMap(map);
+    flightPath3.setMap(map);
+
+
+   
+
+   // alert(google.maps.geometry.spherical.computeDistanceBetween (p0, p2));
+
+
+}
+
+
+
+
+
+
+distHaversine = function(p1, p2) {
+  var R = 6371; // earth's mean radius in km
+  var dLat  = rad(p2.lat() - p1.lat());
+  var dLong = rad(p2.lng() - p1.lng());
+
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) * Math.sin(dLong/2) * Math.sin(dLong/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var d = R * c;
+
+  return d.toFixed(3);
+}
+
+</script>
+</head>
+<body onload="initialize()">
+  <font face="Arial">	
+  <h1>Software para localização de origem de sinal por triangulação de antenas. </h1>
+
+  <h2> Como funciona </h2>
+  <p>
+  A idéia é medir a direção do fonte de sinal com antenas direcionais a partir de vários pontos conhecidos em um mapa. 
+  Em seguida, traça-se retas a partir destes pontos em direção à fonte do sinal. O ponto de convergencia de todas as retas traçadas, em princípio, será o local de origem do sinal. 
+  Teoricamente, bastariam 2 pontos de origem, mas quanto maior o número de pontos de origem, mais precisa será a localização.
+  <p>
+  Nesta versão os pontos de origem, isto é, de onde se mede o sinal, são informados por meio de coordandas de GPS. A direção é informada passando-se o azimute da direção do sinal, em graus, em relação ao norte magnético.
+  <p>
+  Vale lembrar que o erro na medição do azimute ocasiona erro na localização que varia em relação à distância da origem da medida à fonte do sinal.
+  <br>  
+
+  <form name="pontos">
+  <table border=1>
+ 
+  <tr>
+  <td>Ponto</td>	  
+  <td>Latitude</td>
+  <td>Longitude</td>
+  <td>Azimute</td>
+  </tr>
+  
+
+  <tr>
+  <td>1</td>	  
+  <td><input type=text value="-19.942129" name=lat1></td>
+  <td><input type=text value="-44.035904" name=lon1></td>
+  <td><input type=text value="38" 	name=az1></td>
+  </tr>
+   
+  <tr>
+  <td>2</td>
+  <td><input type=text value="-19.936711" name=lat2></td>
+  <td><input type=text value="-43.91183" name=lon2></td>
+  <td><input type=text value="12"       name=az2></td>
+  </tr>
+  
+  <td>3</td> 
+  <td><input type=text value="-19.818303" name=lat3></td>
+  <td><input type=text value="-43.955599" name=lon3></td>
+  <td><input type=text value="70"       name=az3></td>
+  </tr>
+  </table>
+  <br>
+  <input type=button value="TRIANGULAR" onClick="desenhar()">
+  <br>  
+</form>
+
+  <br>
+  <div id="map_canvas"></div>
+  </font>
+</body>
+</html>
+
+
